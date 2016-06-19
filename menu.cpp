@@ -3,6 +3,7 @@
 #include "bits/stdc++.h"
 #include <QDebug>
 #include <QString>
+#include <QFile>
 #include <QMessageBox>
 
 using namespace std;
@@ -46,7 +47,7 @@ menu::menu(QWidget *parent) : QWidget(parent)
 
     //Main Buttons
     play_button = new QPushButton(this);
-    play_button->setGeometry(51,230,150,40);
+    play_button->setGeometry(51,200,150,40);
     play_button->setCursor(Qt::PointingHandCursor);
     play_button->setIcon(QIcon(":/img/play2.png"));
     play_button->setIconSize(QSize(150,40));
@@ -54,7 +55,7 @@ menu::menu(QWidget *parent) : QWidget(parent)
     QObject::connect(play_button,SIGNAL(clicked(bool)),this,SLOT(new_game()));
 
     howTo_button = new QPushButton(this);
-    howTo_button->setGeometry(50,300,150,40);
+    howTo_button->setGeometry(50,270,150,40);
     howTo_button->setCursor(Qt::PointingHandCursor);
     howTo_button->setIcon(QIcon(":/img/help2.png"));
     howTo_button->setIconSize(QSize(150,40));
@@ -62,15 +63,23 @@ menu::menu(QWidget *parent) : QWidget(parent)
     QObject::connect(howTo_button,SIGNAL(clicked(bool)),this,SLOT(help()));
 
     about_button = new QPushButton(this);
-    about_button->setGeometry(50,370,150,40);
+    about_button->setGeometry(50,340,150,40);
     about_button->setCursor(Qt::PointingHandCursor);
     about_button->setIcon(QIcon(":/img/credits2.png"));
     about_button->setIconSize(QSize(150,40));
     about_button->raise();
     QObject::connect(about_button,SIGNAL(clicked(bool)),this,SLOT(about()));
 
+    score_list = new QPushButton(this);
+    score_list->setGeometry(50,410,150,40);
+    score_list->setCursor(Qt::PointingHandCursor);
+    score_list->setIcon(QIcon(":/img/topScore.png"));
+    score_list->setIconSize(QSize(150,40));
+    score_list->raise();
+    QObject::connect(score_list,SIGNAL(clicked(bool)),this,SLOT(score()));
+
     exit_button = new QPushButton(this);
-    exit_button->setGeometry(50,510,150,40);
+    exit_button->setGeometry(50,480,150,40);
     exit_button->setCursor(Qt::PointingHandCursor);
     exit_button->setIcon(QIcon(":/img/exit2.png"));
     exit_button->setIconSize(QSize(150,40));
@@ -110,13 +119,6 @@ menu::menu(QWidget *parent) : QWidget(parent)
     avatar->raise();
 
 
-    score_list = new QPushButton(this);
-    score_list->setGeometry(50,440,150,40);
-    score_list->setCursor(Qt::PointingHandCursor);
-    score_list->setIcon(QIcon(":/img/topScore.png"));
-    score_list->setIconSize(QSize(150,40));
-    score_list->raise();
-    QObject::connect(score_list,SIGNAL(clicked(bool)),this,SLOT(list()));
 
 }
 
@@ -164,34 +166,63 @@ void menu::menu_sound()
     }
 }
 
-void menu:: list()
+void menu:: score()
 {
-    freopen("score.txt","a+",stdin);
-    int x;
-    unsigned int i=0;
-    while(cin>>x && i<100)
-    {
-        best[i++]=x;
-    }
-    sort(best,best+100);
-    reverse(best,best+100);
+    QFile file("D:/Maze_score.txt");
+        QString r ;
+        r="";
+        int k=1 ;
 
-    string r="";
-    for(int k=0;k<5;k++)
-    {
-        r+=to_string(k+1);
-        r+=")- ";
-        r+=to_string(best[k]);
-        r+="   \n";
-    }
-    QMessageBox m;
-    m.setBaseSize(QSize(600, 120));
-    m.setWindowTitle("SCORES");
-    m.setIcon(QMessageBox::Information);
-    m.setText(r.c_str());
-    m.exec();
+      file.open(QIODevice::ReadOnly | QIODevice::Text);
+
+            QTextStream flux(&file);
+            while(!flux.atEnd() && k<=5)
+            {
+                QString temp = flux.readLine();
+                r+="Score";
+                r+=QString::number(k);
+                r+=" : ";
+                if(temp.toInt()>9)
+                   r+=temp;
+               else
+               {
+                   r+="0"+temp;
+               }
+                r+="\n";
+                k++ ;
+            }
+            if(k<=5)
+            {
+              for(int i=k;i<=5;i++)
+              {
+               r+="Score";
+               r+=QString::number(i);
+               r+=" : 00\n" ;
+              }
+            }
 
 
+            file.close();
+
+
+    score_page = new QWidget();
+    score_page->setFixedSize(320,500);
+    score_page->setWindowTitle("ScoreBoard");
+    score_page->setWindowIcon(QIcon(":/img/menu_icon.png"));
+    QLabel *bg = new QLabel(score_page);
+    bg->setGeometry(0,0,320,500);
+    QPixmap *bgP = new QPixmap(":/img/scoreboard.png");
+    bg->setPixmap(*bgP);
+    bg->raise();
+    QLabel *board =  new QLabel(score_page);
+    board->setGeometry(0,250,320,250);
+    QString text=r ;
+    board->setText(text);
+    board->setAlignment(Qt::AlignCenter);
+    board->setFont(QFont("Elephant",20,5,false));
+    board->setStyleSheet("QLabel {color : white; }");
+    board->raise();
+    score_page->show();
 
 }
 

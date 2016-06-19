@@ -29,7 +29,7 @@ public:
     void generate_maze();
     void win();
     void lose();
-    std::vector<int> best;
+    void write_score() ;
 
 private:
 
@@ -61,7 +61,6 @@ public slots:
     void solve();
     void GameSound_button();
     void SoundEffect_button();
-
     void again();
     void My_timer();
     void keyPressEvent (QKeyEvent * event);

@@ -4,6 +4,8 @@
 #include <QTime>
 #include <QTimer>
 #include <QDebug>
+#include <QFile>
+#include <QString>
 #include "bits/stdc++.h"
 using namespace std;
 
@@ -70,7 +72,9 @@ game::game(int lvl,int avtr)
 
     timing = new QLabel(text,this);
     timing->setGeometry(640,60,150,40);
-    timing->setText(to_string(time).c_str());
+    string r="";
+    r+=to_string(time)+" sec";
+    timing->setText(r.c_str());
     timing->setAlignment(Qt::AlignCenter);
     timing->setFont(QFont("verdana",20,5,false));
     timing->raise();
@@ -89,7 +93,7 @@ game::game(int lvl,int avtr)
     scoring->setGeometry(640,160,150,40);
     scoring->setText(to_string(score).c_str());
     scoring->setAlignment(Qt::AlignCenter);
-    scoring->setFont(QFont("verdana",20,5,false));
+    scoring->setFont(QFont("Calibri",20,5,false));
     scoring->raise();
 
 
@@ -510,14 +514,48 @@ void game::keyPressEvent ( QKeyEvent * event)
 
 }
 
+
+void game::write_score(){
+
+          QFile file("D:/Maze_score.txt");
+          std::vector<int> scores;
+
+          if(file.open(QIODevice::ReadOnly | QIODevice::Text)) // remplir le vecteur par les scores
+          {
+              QTextStream flux(&file);
+              while(!flux.atEnd())
+              {
+                  QString temp = flux.readLine();
+                  scores.push_back( temp.toInt() ) ;
+              }
+
+              file.close();
+          }
+          //ajouter le nouveau score si il n'existe pas deja
+          if(std::find(scores.begin(),scores.end(),score) == scores.end())
+              scores.push_back(score);
+          std::sort(scores.rbegin(),scores.rend()); // tri inverse de scores
+
+          file.resize(0) ;   // vider le ficher
+
+         for(unsigned int i=0;i<scores.size();i++) {
+
+             if(file.open(QIODevice::Append | QIODevice::Text)) // ajout de scores triés
+             {
+             QTextStream stream(&file);
+             stream << scores[i] << endl;
+             file.close();
+             }
+          }
+
+
+
+}
+
 void game::win()
 {
     timer->stop();
-
-    best.push_back(score);
-    freopen("score.txt","a+",stdout);
-    for(unsigned int i=0;i<best.size();i++)
-      cout<<best[i]<<"\n";
+    write_score();
      time=0;
      if(gameMute==0)
      {
@@ -581,11 +619,13 @@ void game::My_timer()
        }
 
     time--;
+    string r="";
+    r+=to_string(time)+" sec";
     if(time>=6)
     {
-        timing->setText(to_string(time).c_str());
+        timing->setText(r.c_str());
     }
-    if(time>0 &&time<=5)
+    if(time>=0 &&time<=5)
     {
         if(effectMute==0)
         {
@@ -595,7 +635,7 @@ void game::My_timer()
         }
         QPixmap *late=new QPixmap(":/img/danger.png");
         time_bg->setPixmap(*late);
-        timing->setText(to_string(time).c_str());
+        timing->setText(r.c_str());
     }
     score=(100*time)/initial;
     scoring->setText(to_string(score).c_str());

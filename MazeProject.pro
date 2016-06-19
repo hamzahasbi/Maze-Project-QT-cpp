@@ -6,6 +6,7 @@
 
 QT       += core gui \
              multimedia
+INCLUDEPATH += .
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -15,7 +16,6 @@ TEMPLATE = app
 CONFIG += c++11
 
 SOURCES += main.cpp\
-        widget.cpp \
         menu.cpp \
     maze.cpp \
     prim.cpp \
@@ -23,7 +23,7 @@ SOURCES += main.cpp\
     growing_tree.cpp \
     game.cpp
 
-HEADERS  += widget.h \
+HEADERS  += \
          menu.h \
     maze.h \
     prim.h \
@@ -31,7 +31,7 @@ HEADERS  += widget.h \
     growing_tree.h \
     game.h
 
-FORMS    += widget.ui
+FORMS    +=
 
 RESOURCES += \
     resources.qrc
